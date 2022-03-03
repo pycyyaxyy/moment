@@ -13,9 +13,10 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue"
-import { ElForm } from "element-plus"
+import { ElForm, ElMessage } from "element-plus"
 import { useStore } from "vuex"
 import { rules } from "../config/account-config"
+import LocalCache from "@/utils/cache"
 
 export default defineComponent({
   name: "login-account",
@@ -31,12 +32,34 @@ export default defineComponent({
     //vuex
     const store = useStore()
 
+    //是否需要弹出弹窗（如果密码符合要求但是服务器中没有改数据）
+    // const isValid = ref(false)
+
     const loginAction = (isKeepPassword: boolean) => {
       //拿到form的组件实例，调用其中的validate方法，里面会传入一个回调函数，参数代表是否验证通过
       formRef.value?.validate((valid) => {
         if (valid) {
-          //执行真正的登录逻辑
-          console.log("执行真正的登录逻辑")
+          // 1.判断是否需要记住密码
+          if (isKeepPassword) {
+            //本地缓存
+            LocalCache.setCache("name", account.name)
+            LocalCache.setCache("password", account.password)
+          } else {
+            //清除账号密码
+            LocalCache.deleteCache("name")
+            LocalCache.deleteCache("password")
+          }
+          //2.开始进行登录验证（这里搞了一个异常捕获，async函数的出错处理直接可以在外面catch到）
+          store
+            .dispatch("login/accountLoginAction", { ...account })
+            .catch((err) => {
+              console.log(err)
+              //搞一个出错弹框
+              ElMessage.error({
+                showClose: true,
+                message: err,
+              })
+            })
         }
       })
     }
@@ -45,6 +68,7 @@ export default defineComponent({
       account,
       rules,
       formRef,
+      // isValid,
       loginAction,
     }
   },

@@ -6,8 +6,8 @@ export const rules = {
       trigger: "blur",
     },
     {
-      pattern: /^[a-z0-9]{5,10}$/,
-      message: "用户名由5-10位小写字母和数字组成~",
+      pattern: /^[a-z0-9]{3,10}$/,
+      message: "用户名由3-10位小写字母和数字组成~",
       trigger: "blur",
     },
   ],
