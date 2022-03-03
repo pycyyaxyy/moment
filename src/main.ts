@@ -1,6 +1,7 @@
 import { createApp } from "vue"
 import ElementPlus from "element-plus"
 import "element-plus/dist/index.css"
+import * as ElIcons from "@element-plus/icons-vue"
 import "normalize.css"
 import "./assets/css/index.less"
 import App from "./App.vue"
@@ -8,7 +9,13 @@ import router from "./router"
 import store from "./store"
 import peRequest from "@/service"
 
-createApp(App).use(store).use(router).use(ElementPlus).mount("#app")
+const app = createApp(App)
+//给全局注册element-plus-icons
+for (const name in ElIcons) {
+  app.component(name, (ElIcons as any)[name])
+}
+
+app.use(store).use(router).use(ElementPlus).mount("#app")
 
 // peRequest.request({
 //   url: "/moment",
