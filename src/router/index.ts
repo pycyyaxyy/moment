@@ -10,11 +10,33 @@ const routes: Array<RouteRecordRaw> = [
     path: "/main",
     name: "main",
     component: () => import("@/views/main/main.vue"),
+    children: [
+      {
+        path: "momentList",
+        name: "momentList",
+        component: () => import("@/views/main/momentList/momentList.vue"),
+      },
+      {
+        path: "myMoment",
+        name: "myMoment",
+        component: () => import("@/views/main/myMoment/myMoment.vue"),
+      },
+      {
+        path: "publishMoment",
+        name: "publishMoment",
+        component: () => import("@/views/main/publishMoment/publishMoment.vue"),
+      },
+    ],
   },
   {
     path: "/login",
     name: "login",
     component: () => import("@/views/login/login.vue"),
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: () => import("@/views/not-found/not-found.vue"),
   },
 ]
 
