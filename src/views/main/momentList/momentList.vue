@@ -1,18 +1,321 @@
 <template>
   <div class="momentlist">
-    <h2>momentlist</h2>
+    <h2 class="slogan">Life is short , sharing your moment!</h2>
+    <div class="page-content">
+      <el-row>
+        <el-col :span="18">
+          <template v-for="item in momentList" :key="item.id">
+            <div class="cardItem">
+              <el-card :body-style="{ padding: '20px' }">
+                <template v-if="item.images">
+                  <el-image
+                    style="width: 250px; height: 250px"
+                    :src="item.images[0]"
+                    :preview-src-list="item.images"
+                  ></el-image>
+                  <el-divider></el-divider>
+                </template>
+                <!-- 卡片的文字内容 -->
+                <div style="padding: 14px">
+                  <div>
+                    <span>{{ item.content }}</span>
+                  </div>
+
+                  <div class="bottom">
+                    <span class="author">
+                      <el-avatar
+                        class="authorAvatar"
+                        shape="circle"
+                        :size="30"
+                        :src="item.author.avatarUrl"
+                      ></el-avatar>
+                      {{ item.author.name }}
+                    </span>
+                    <span>评论数:{{ item.commentCount }}</span>
+                    <time class="time">{{
+                      //这里把utc时间转成标准时间
+                      new Date(item.createTime).toLocaleString()
+                    }}</time>
+                    <el-button
+                      type="text"
+                      class="button"
+                      @click="checkMomentDetail(item.id)"
+                      >详情
+                    </el-button>
+                  </div>
+                </div>
+              </el-card>
+            </div>
+          </template>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="block">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 20, 40]"
+        :page-size="size"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="1000"
+      >
+      </el-pagination>
+    </div>
+    <el-drawer
+      class="moment-detail"
+      title="动态详情"
+      v-model="drawer"
+      :direction="direction"
+      size="50%"
+      destroy-on-close
+    >
+      <!-- 展示评论详情中的图片 -->
+      <template v-if="sigleMomentDetail.images">
+        <div class="picture">
+          <template v-for="item in sigleMomentDetail.images" :key="item">
+            <span class="picture-item">
+              <el-image
+                :src="item"
+                style="width: 150px; height: 150px"
+              ></el-image>
+            </span>
+          </template>
+        </div>
+        <el-divider></el-divider>
+      </template>
+
+      <!-- 展示动态详情中的标签内容 -->
+      <template v-if="sigleMomentDetail.labels">
+        <div class="labels">
+          <template v-for="item in sigleMomentDetail.labels" :key="item.id">
+            <el-tag type="warning">{{ item.name }}</el-tag>
+          </template>
+        </div>
+        <el-divider></el-divider>
+      </template>
+
+      <!-- 展示动态详情中的内容 -->
+      <div class="content">
+        <p>{{ sigleMomentDetail.content }}</p>
+      </div>
+      <el-divider></el-divider>
+
+      <!-- 展示评论列表 -->
+      <template v-if="sigleMomentDetail.comments">
+        <div class="comments">
+          <template v-for="item in sigleMomentDetail.comments" :key="item.id">
+            <div class="comment-item">
+              <span class="author">
+                <el-avatar
+                  class="authorAvatar"
+                  shape="circle"
+                  :size="30"
+                  :src="item.user.avatarUrl"
+                ></el-avatar>
+                {{ item.user.name }}
+              </span>
+              <span>: &nbsp; </span>
+              {{ item.content }}
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <!-- 发布评论 -->
+      <div class="publish-comment">
+        <el-input
+          type="textarea"
+          :rows="3"
+          placeholder="请输入内容"
+          v-model="textarea"
+        >
+        </el-input>
+        <el-button @click="handlePublishComment">发表评论</el-button>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
+import { defineComponent, onMounted, computed, ref } from "vue"
+import { useStore } from "@/store/index"
 
 export default defineComponent({
   name: "momentList",
+  components: {},
   setup() {
-    return {}
+    const store = useStore()
+
+    //设置初始size和offset
+    let size = 5
+    let offset = 0
+    onMounted(() => {
+      //这里先直接写死偏移量和size
+      //初次请求只展示5条数据
+      store.dispatch("moment/getMomentListAction", {
+        offset,
+        size,
+      })
+    })
+
+    //设置遮罩层
+    const drawer = ref(false)
+
+    //当前的页数，默认为1
+    const currentPage = ref(1)
+
+    //评论内容
+    const textarea = ref("")
+
+    //从vuex中获取动态列表和单条动态详情
+    const momentList = computed(() => store.state.moment.momentList)
+    const sigleMomentDetail = computed(
+      () => store.state.moment.singleMomentDetail
+    )
+
+    const handleSizeChange = (val: number) => {
+      //size就相当于后端的请求中的size
+      //修改size
+      size = val
+      // console.log("size:", size)
+      //修改了之后要根据当前最新的size和offset处理请求
+      store.dispatch("moment/getMomentListAction", {
+        offset,
+        size,
+      })
+    }
+    const handleCurrentChange = (val: number) => {
+      //这个参数是页数，但是是从1开始，后端的offset从0开始，这里还要转化
+      offset = (val - 1) * size
+      // console.log("offset", offset)
+      currentPage.value = val
+      //修改了之后要根据当前最新的size和offset处理请求
+      store.dispatch("moment/getMomentListAction", {
+        offset,
+        size,
+      })
+    }
+
+    //显示动态详情
+    const checkMomentDetail = (id: number) => {
+      // console.log("动态id:", id)
+      //拿到动态id之后，展示遮罩层，在遮罩层里面显示动态详情。
+      //1.先拿到动态详情数据
+      store.dispatch("moment/getSingleMomentDetialAction", id)
+      // console.log("单条动态详情：", sigleMomentDetail)
+
+      //2.显示遮罩层
+      drawer.value = true
+    }
+
+    //提交评论
+    const handlePublishComment = () => {
+      //首先拿到输入框的内容
+      const commentValue = textarea.value
+      //再拿到需要评论的动态id
+      const momentId = store.state.moment.singleMomentDetail?.id
+
+      console.log("content:", commentValue)
+      console.log("momentId:", momentId)
+    }
+
+    return {
+      size,
+      momentList,
+      sigleMomentDetail,
+      currentPage,
+      drawer,
+      direction: "rtl", //控制弹出方向
+      textarea,
+      handleSizeChange,
+      handleCurrentChange,
+      checkMomentDetail,
+      handlePublishComment,
+    }
   },
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.slogan {
+  color: #303133;
+  font-style: oblique;
+}
+.momentlist {
+  padding: 10px;
+  background: rgba(203, 204, 190, 0.4);
+}
+
+.page-content {
+  margin: 10px auto;
+}
+.el-row {
+  justify-content: space-around;
+}
+.cardItem {
+  margin: 20px 0;
+}
+.time {
+  font-size: 13px;
+  color: #999;
+}
+
+.bottom {
+  margin-top: 13px;
+  line-height: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #999;
+}
+
+.authorAvatar {
+  vertical-align: middle;
+}
+.button {
+  padding: 0;
+  min-height: auto;
+}
+
+.image {
+  width: 50%;
+  display: block;
+}
+
+.block {
+  display: flex;
+  justify-content: space-around;
+}
+.moment-detail .picture {
+  display: flex;
+  justify-content: space-around;
+  flex-flow: wrap;
+  align-content: space-around;
+}
+.picture-item {
+  margin: 20px 20px;
+}
+
+.labels {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.moment-detail .content {
+  padding: 10px;
+}
+
+.comments {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.publish-comment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+</style>

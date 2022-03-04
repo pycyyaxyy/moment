@@ -49,8 +49,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue"
-import { useStore } from "@/store"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   name: "nav-menu",
@@ -61,14 +60,7 @@ export default defineComponent({
     },
   },
   setup() {
-    const store = useStore()
-
-    const userMoments = computed(() => store.state.login.userMoment)
-    console.log(userMoments.value)
-
-    return {
-      userMoments,
-    }
+    return {}
   },
 })
 </script>
