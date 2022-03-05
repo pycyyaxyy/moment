@@ -61,7 +61,7 @@ const LoginModule: Module<ILoginState, IRootState> = {
 
       //登录成功后跳转到首页
       //4.跳到首页 (通过路由跳转即可)
-      router.push("/main")
+      router.push("/main/momentList")
     },
 
     //为了恢复vuex数据，如果已经登录的状况下，防止刷新或者关闭浏览器再打开丢失vuex的数据
