@@ -1,6 +1,9 @@
 <template>
   <div class="momentlist">
+    <!-- 页面标题 -->
     <h2 class="slogan">Life is short , sharing your moment!</h2>
+
+    <!-- 页面内容 -->
     <div class="page-content">
       <el-row>
         <el-col :span="18">
@@ -50,6 +53,8 @@
         </el-col>
       </el-row>
     </div>
+
+    <!-- 分页 -->
     <div class="block">
       <el-pagination
         @size-change="handleSizeChange"
@@ -62,84 +67,89 @@
       >
       </el-pagination>
     </div>
-    <el-drawer
-      class="moment-detail"
-      title="动态详情"
-      v-model="drawer"
-      :direction="direction"
-      size="50%"
-      destroy-on-close
-    >
-      <!-- 展示评论详情中的图片 -->
-      <template v-if="sigleMomentDetail.images">
-        <div class="picture">
-          <template v-for="item in sigleMomentDetail.images" :key="item">
-            <span class="picture-item">
-              <el-image
-                :src="item"
-                style="width: 150px; height: 150px"
-              ></el-image>
-            </span>
-          </template>
-        </div>
-        <el-divider></el-divider>
-      </template>
 
-      <!-- 展示动态详情中的标签内容 -->
-      <template v-if="sigleMomentDetail.labels">
-        <div class="labels">
-          <template v-for="item in sigleMomentDetail.labels" :key="item.id">
-            <el-tag type="warning">{{ item.name }}</el-tag>
-          </template>
-        </div>
-        <el-divider></el-divider>
-      </template>
-
-      <!-- 展示动态详情中的内容 -->
-      <div class="content">
-        <p>{{ sigleMomentDetail.content }}</p>
-      </div>
-      <el-divider></el-divider>
-
-      <!-- 展示评论列表 -->
-      <template v-if="sigleMomentDetail.comments">
-        <div class="comments">
-          <template v-for="item in sigleMomentDetail.comments" :key="item.id">
-            <div class="comment-item">
-              <span class="author">
-                <el-avatar
-                  class="authorAvatar"
-                  shape="circle"
-                  :size="30"
-                  :src="item.user.avatarUrl"
-                ></el-avatar>
-                {{ item.user.name }}
+    <!-- 动态详情 -->
+    <div class="moment-detail">
+      <el-drawer
+        title="动态详情"
+        v-model="drawer"
+        :direction="direction"
+        size="50%"
+        destroy-on-close
+      >
+        <!-- 展示评论详情中的图片 -->
+        <template v-if="sigleMomentDetail.images">
+          <div class="picture">
+            <template v-for="item in sigleMomentDetail.images" :key="item">
+              <span class="picture-item">
+                <el-image
+                  :src="item"
+                  style="width: 150px; height: 150px"
+                ></el-image>
               </span>
-              <span>: &nbsp; </span>
-              {{ item.content }}
-            </div>
-          </template>
-        </div>
-      </template>
+            </template>
+          </div>
+          <el-divider></el-divider>
+        </template>
 
-      <!-- 发布评论 -->
-      <div class="publish-comment">
-        <el-input
-          type="textarea"
-          :rows="3"
-          placeholder="请输入内容"
-          v-model="textarea"
-        >
-        </el-input>
-        <el-button @click="handlePublishComment">发表评论</el-button>
-      </div>
-    </el-drawer>
+        <!-- 展示动态详情中的标签内容 -->
+        <template v-if="sigleMomentDetail.labels">
+          <div class="labels">
+            <template v-for="item in sigleMomentDetail.labels" :key="item.id">
+              <el-tag type="warning">{{ item.name }}</el-tag>
+            </template>
+          </div>
+          <el-divider></el-divider>
+        </template>
+
+        <!-- 展示动态详情中的内容 -->
+        <div class="content">
+          <p>{{ sigleMomentDetail.content }}</p>
+        </div>
+        <el-divider></el-divider>
+
+        <!-- 展示评论列表 -->
+        <template v-if="sigleMomentDetail.comments">
+          <div class="comments">
+            <template v-for="item in sigleMomentDetail.comments" :key="item.id">
+              <div class="comment-item">
+                <span class="author">
+                  <el-avatar
+                    class="authorAvatar"
+                    shape="circle"
+                    :size="30"
+                    :src="item.user.avatarUrl"
+                  ></el-avatar>
+                  {{ item.user.name }}
+                </span>
+                <span>: &nbsp; </span>
+                {{ item.content }}
+              </div>
+            </template>
+          </div>
+          <el-divider></el-divider>
+        </template>
+
+        <!-- 发布评论 -->
+        <div class="publish-comment">
+          <el-input
+            type="textarea"
+            :rows="3"
+            placeholder="请输入内容"
+            v-model="textarea"
+          >
+          </el-input>
+          <el-button @click="handlePublishComment">发表评论</el-button>
+        </div>
+      </el-drawer>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, computed, ref } from "vue"
 import { useStore } from "@/store/index"
+import { ElMessage } from "element-plus"
 
 export default defineComponent({
   name: "momentList",
@@ -167,6 +177,9 @@ export default defineComponent({
 
     //评论内容
     const textarea = ref("")
+
+    //遮罩层弹出方向
+    const direction = ref("rtl")
 
     //从vuex中获取动态列表和单条动态详情
     const momentList = computed(() => store.state.moment.momentList)
@@ -210,14 +223,41 @@ export default defineComponent({
     }
 
     //提交评论
-    const handlePublishComment = () => {
+    const handlePublishComment = async () => {
       //首先拿到输入框的内容
-      const commentValue = textarea.value
+      const content = textarea.value
       //再拿到需要评论的动态id
       const momentId = store.state.moment.singleMomentDetail?.id
 
-      console.log("content:", commentValue)
+      console.log("content:", content)
       console.log("momentId:", momentId)
+
+      //派发事件(根据动态id发表评论)
+      //这里逻辑不是很清晰，由于我在moment里面查单独的动态信息是联合comment来查询
+      //所以对应的store里面已经有comment的信息，那么我直接在这里调用comment的router插入新的评论即可
+      //本来定义了一个comment的store感觉这里没用上
+      //后续如果我搞一个我的评论列表可能在用上这个comment的store
+      //这里还是用store吧 好以后修改
+
+      // 1.插入评论,dispatch 返回一个promise 那么这里需要将函数改造成异步函数，加await阻塞，
+      // 下面的dispatch也要阻塞，这样才能保证顺序，先发布评论成功，再刷新动态详情更新vuex，才能做到实时响应
+      await store.dispatch("comment/publishCommentAction", {
+        momentId,
+        content,
+      })
+
+      //2.刷新vuex中的动态信息，因为已经增加了一条评论
+      await store.dispatch("moment/getSingleMomentDetialAction", momentId)
+
+      //3.提示添加评论成功
+      ElMessage({
+        showClose: true,
+        message: "评论成功",
+        type: "success",
+      })
+
+      //4.把textarea的内容清空，等待下一次输入
+      textarea.value = ""
     }
 
     return {
@@ -226,7 +266,7 @@ export default defineComponent({
       sigleMomentDetail,
       currentPage,
       drawer,
-      direction: "rtl", //控制弹出方向
+      direction, //控制弹出方向
       textarea,
       handleSizeChange,
       handleCurrentChange,
@@ -311,6 +351,10 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.comment-item {
+  margin: 5px 2px;
 }
 
 .publish-comment {

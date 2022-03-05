@@ -46,6 +46,8 @@ const MomentModule: Module<IMomentState, IRootState> = {
 
     //获取单条动态详情(通过动态id)
     async getSingleMomentDetialAction({ commit }, payload: number) {
+      console.log("来到了获取动态详情")
+
       const momentDetail = await MomentDetailRequest(payload)
       // console.log("momentDetail:", momentDetail)
       commit("changeSingleMomentDetail", momentDetail)

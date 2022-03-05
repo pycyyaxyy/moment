@@ -4,7 +4,7 @@ import LocalCache from "@/utils/cache"
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/main",
+    redirect: "/main/momentList",
   },
   {
     path: "/main",

@@ -31,7 +31,7 @@ class PeRequest {
     //全局的拦截器
     this.instance.interceptors.request.use(
       (config) => {
-        console.log("所有实例都有的拦截器：请求拦截成功")
+        // console.log("所有实例都有的拦截器：请求拦截成功")
         //添加loading动画
         if (this.showLoading) {
           this.loading = ElLoading.service({
@@ -44,13 +44,13 @@ class PeRequest {
         return config
       },
       (err) => {
-        console.log("所有实例都有的拦截器：请求拦截失败")
+        // console.log("所有实例都有的拦截器：请求拦截失败")
         return err
       }
     )
     this.instance.interceptors.response.use(
       (res) => {
-        console.log("所有实例都有的拦截器：响应拦截成功")
+        // console.log("所有实例都有的拦截器：响应拦截成功")
         //移除loading动画
         this.loading?.close()
 
@@ -58,7 +58,7 @@ class PeRequest {
         return res.data
       },
       (err) => {
-        console.log("所有实例都有的拦截器：响应拦截失败")
+        // console.log("所有实例都有的拦截器：响应拦截失败")
         //移除loading动画
         this.loading?.close()
         return err
