@@ -198,7 +198,11 @@ export default defineComponent({
       const content = textarea.value
 
       if (!content) {
-        ElMessage("内容不能为空！")
+        ElMessage({
+          showClose: true,
+          message: "内容不能为空！",
+          type: "error",
+        })
         return
       }
 
@@ -214,7 +218,11 @@ export default defineComponent({
       //给动态添加配图
 
       //提示发布成功且清空内容
-      ElMessage("发布成功！")
+      ElMessage({
+        showClose: true,
+        message: "发布动态成功！",
+        type: "success",
+      })
       textarea.value = ""
       momentlabelList.clear()
       forceBlur(event)
