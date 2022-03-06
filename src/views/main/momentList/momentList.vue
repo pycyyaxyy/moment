@@ -62,7 +62,7 @@
         :current-page="currentPage"
         :page-sizes="[5, 10, 20, 40]"
         :page-size="size"
-        layout="total, sizes, prev, pager, next, jumper"
+        layout=" sizes, prev, pager, next, jumper"
         :total="1000"
       >
       </el-pagination>
@@ -150,6 +150,7 @@
 import { defineComponent, onMounted, computed, ref } from "vue"
 import { useStore } from "@/store/index"
 import { ElMessage } from "element-plus"
+import forceBlur from "@/utils/forceBlur"
 
 export default defineComponent({
   name: "momentList",
@@ -187,6 +188,9 @@ export default defineComponent({
       () => store.state.moment.singleMomentDetail
     )
 
+    //获取反转后的动态列表（可以显示最新发布的动态）这里不能这么搞，待会搞完其他的再来搞这个
+    // const momentList_reverse = momentList.value.reverse()
+
     const handleSizeChange = (val: number) => {
       //size就相当于后端的请求中的size
       //修改size
@@ -223,7 +227,7 @@ export default defineComponent({
     }
 
     //提交评论
-    const handlePublishComment = async () => {
+    const handlePublishComment = async (event: any) => {
       //首先拿到输入框的内容
       const content = textarea.value
       //再拿到需要评论的动态id
@@ -234,7 +238,7 @@ export default defineComponent({
 
       //派发事件(根据动态id发表评论)
       //这里逻辑不是很清晰，由于我在moment里面查单独的动态信息是联合comment来查询
-      //所以对应的store里面已经有comment的信息，那么我直接在这里调用comment的router插入新的评论即可
+      //所以对应的store里面已经有comment的信息，那么我直接在这里调用comment的service插入新的评论即可
       //本来定义了一个comment的store感觉这里没用上
       //后续如果我搞一个我的评论列表可能在用上这个comment的store
       //这里还是用store吧 好以后修改
@@ -258,6 +262,7 @@ export default defineComponent({
 
       //4.把textarea的内容清空，等待下一次输入
       textarea.value = ""
+      forceBlur(event)
     }
 
     return {

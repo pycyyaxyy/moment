@@ -1,6 +1,7 @@
 export interface IMomentState {
   momentList: momentDetailInList[]
   singleMomentDetail?: singleMomentType
+  insertId?: number
 }
 
 export interface momentDetailInList {

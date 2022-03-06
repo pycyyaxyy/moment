@@ -3,6 +3,7 @@ import { IRootState, IStoreType } from "./types"
 import login from "./login/login"
 import moment from "./moment/moment"
 import comment from "./comment/comment"
+import label from "./label/label"
 
 const store = createStore<IRootState>({
   state: () => {
@@ -17,6 +18,7 @@ const store = createStore<IRootState>({
     login,
     moment,
     comment,
+    label,
   },
 })
 

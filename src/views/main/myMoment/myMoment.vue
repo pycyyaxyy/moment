@@ -1,7 +1,5 @@
 <template>
-  <div class="mymoment">
-    <h2>mymoment</h2>
-  </div>
+  <div class="mymoment"></div>
 </template>
 
 <script lang="ts">
