@@ -104,6 +104,7 @@
         <plus />
       </el-icon>
     </el-upload>
+    <el-divider></el-divider>
 
     <!-- 底部按钮 -->
     <div class="footer">

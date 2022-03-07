@@ -6,6 +6,8 @@ enum MomentAPI {
   MomentDetailUrl = "/moment", //实际上的路径是/moment/:momentId
   MomentInsertUrl = "/moment", //实际上的路径是/moment 在data中用json传递数据
   MomentAddLabelsUrl = "/moment", //实际上的路径是/moment/:momentId/labels
+  MomentDeleteUrl = "/moment", //实际上的路径是/moment/:momentId
+  MomentPatchUrl = "/moment", //实际上的路径是/moment/:momentId,在data中传数据
 }
 
 export function MomentListRequest(moment: IMoment) {
@@ -36,6 +38,21 @@ export function MomentAddLabels(payload: any) {
     url: MomentAPI.MomentAddLabelsUrl + `/${payload.momentId}` + `/labels`,
     data: {
       labels: payload.labels,
+    },
+  })
+}
+
+export function MomentDelete(momentId: number) {
+  return peRequest.delete({
+    url: MomentAPI.MomentDeleteUrl + `/${momentId}`,
+  })
+}
+
+export function MomentPatch(payload: any) {
+  return peRequest.patch({
+    url: MomentAPI.MomentPatchUrl + `/${payload.momentId}`,
+    data: {
+      content: payload.content,
     },
   })
 }

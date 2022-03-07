@@ -250,8 +250,12 @@ export default defineComponent({
         content,
       })
 
-      //2.刷新vuex中的动态信息，因为已经增加了一条评论
+      //2.刷新vuex中的动态信息和动态列表信息，因为已经增加了一条评论
       await store.dispatch("moment/getSingleMomentDetialAction", momentId)
+      await store.dispatch("moment/getMomentListAction", {
+        offset,
+        size,
+      })
 
       //3.提示添加评论成功
       ElMessage({

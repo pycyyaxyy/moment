@@ -51,10 +51,10 @@ const LoginModule: Module<ILoginState, IRootState> = {
         commit("changeUserInfo", userInfo)
         LocalCache.setCache("userInfo", userInfo)
 
-        // 3.其他网络请求，获取用户发表的动态
-        const userMoment = await accountUserMomentRequest(id)
-        commit("changeUserMoment", userMoment)
-        LocalCache.setCache("userMoment", userMoment)
+        // 3.其他网络请求，获取用户发表的动态(这里不用了)
+        // const userMoment = await accountUserMomentRequest(id)
+        // commit("changeUserMoment", userMoment)
+        // LocalCache.setCache("userMoment", userMoment)
       } else {
         throw new Error("用户名或者密码错误，请重新检查输入")
       }
@@ -76,10 +76,18 @@ const LoginModule: Module<ILoginState, IRootState> = {
         commit("changeUserInfo", userInfo)
       }
 
-      const userMoment = LocalCache.getCache("userMoment")
-      if (userMoment) {
-        commit("changeUserMoment", userMoment)
-      }
+      // const userMoment = LocalCache.getCache("userMoment")
+      // if (userMoment) {
+      //   commit("changeUserMoment", userMoment)
+      // }
+    },
+
+    //根据用户的id来查询其动态详情信息
+    async getUserMomentListAction({ commit }, id: number) {
+      const userMoment = await accountUserMomentRequest(id)
+      // console.log("userMoment:", userMoment)
+
+      commit("changeUserMoment", userMoment)
     },
   },
 }

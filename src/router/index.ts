@@ -50,11 +50,14 @@ const router = createRouter({
 router.beforeEach((to) => {
   if (to.path !== "/login") {
     const token = LocalCache.getCache("token")
-    const userMoment = LocalCache.getCache("userMoment")
+    // const userMoment = LocalCache.getCache("userMoment")
     const userInfo = LocalCache.getCache("userInfo")
 
     //只要有一个不存在就直接返回登录页面
-    if (!token || !userMoment || !userInfo) {
+    // if (!token || !userMoment || !userInfo) {
+    //   return "/login"
+    // }
+    if (!token || !userInfo) {
       return "/login"
     }
   }

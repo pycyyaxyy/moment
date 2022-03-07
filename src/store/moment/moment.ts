@@ -7,6 +7,8 @@ import {
   MomentDetailRequest,
   MomentInsertRequest,
   MomentAddLabels,
+  MomentDelete,
+  MomentPatch,
 } from "@/service/moment/moment"
 
 const MomentModule: Module<IMomentState, IRootState> = {
@@ -72,7 +74,19 @@ const MomentModule: Module<IMomentState, IRootState> = {
     //为动态添加标签
     async addLabelsToMomentAction({ commit }, payload: any) {
       const res = await MomentAddLabels(payload)
-      console.log(res)
+      console.log("为动态添加标签后的返回值:", res)
+    },
+
+    //根据动态id删除动态
+    async deleteMomentAction({ commit }, payload: number) {
+      const res = await MomentDelete(payload)
+      console.log("删除动态之后的返回值:", res)
+    },
+
+    //根据动态id修改动态
+    async patchMomentAction({ commit }, payload: any) {
+      const res = await MomentPatch(payload)
+      console.log("修改动态之后的返回值:", res)
     },
   },
 }
