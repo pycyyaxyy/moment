@@ -4,6 +4,7 @@ import login from "./login/login"
 import moment from "./moment/moment"
 import comment from "./comment/comment"
 import label from "./label/label"
+import upload from "./upload/upload"
 
 const store = createStore<IRootState>({
   state: () => {
@@ -19,6 +20,7 @@ const store = createStore<IRootState>({
     moment,
     comment,
     label,
+    upload,
   },
 })
 

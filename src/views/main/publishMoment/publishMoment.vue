@@ -86,9 +86,26 @@
         </template>
       </el-dialog>
     </div>
-
     <el-divider></el-divider>
 
+    <!-- 上传图片 -->
+    <el-upload
+      ref="upload"
+      action=""
+      list-type="picture-card"
+      :limit="9"
+      :auto-upload="false"
+      :on-change="handleChange"
+      :on-remove="handleRemove"
+      multiple
+      show-file-list
+    >
+      <el-icon>
+        <plus />
+      </el-icon>
+    </el-upload>
+
+    <!-- 底部按钮 -->
     <div class="footer">
       <el-button @click="handleClearMomment" class="reEdit-btn" autofocus>
         重新编辑
@@ -143,6 +160,12 @@ export default defineComponent({
     //待添加的新的标签
     const newLabel = ref("")
 
+    //存放上传的图片
+    let uploadFileList = reactive<any[]>([])
+
+    //拿到upload组件
+    const upload = ref()
+
     const handleSizeChange = (val: number) => {
       //size就相当于后端的请求中的size
       //修改size
@@ -193,10 +216,45 @@ export default defineComponent({
       newLabel.value = ""
     }
 
+    //处理移除文件
+    const handleRemove = (file: any, fileList: any) => {
+      console.log("file:", file)
+      console.log("fileList:", fileList)
+
+      //每次图片数组变化的时候，将数组的全部数据直接保存在新的数组中
+      const arr: any[] = []
+      fileList.forEach((item: any) => {
+        arr.push(item.raw)
+      })
+      uploadFileList = [...arr]
+
+      console.log("uploadFileList:", uploadFileList)
+    }
+
+    //文件上传会调用这个钩子函数
+    const handleChange = (file: any, fileList: any) => {
+      console.log("file:", file)
+      console.log("fileList:", fileList)
+
+      //每次图片数组变化的时候，将数组的全部数据直接保存在新的数组中
+      const arr: any[] = []
+      fileList.forEach((item: any) => {
+        arr.push(item.raw)
+      })
+      uploadFileList = [...arr]
+
+      console.log("uploadFileList:", uploadFileList)
+
+      //picture是后台接受的字段名
+      //文件名 item.name
+      //文件 item.raw
+    }
+
     //处理发布动态
     const handlePublishMomment = async (event: any) => {
       const content = textarea.value
 
+      //内容不能为空
       if (!content) {
         ElMessage({
           showClose: true,
@@ -216,6 +274,22 @@ export default defineComponent({
       })
 
       //给动态添加配图
+      //1.首先判断是否上传了图片，如果上传了图片，将图片存入到formData中
+
+      const formData = new FormData()
+      if (uploadFileList) {
+        uploadFileList.forEach((item) => {
+          console.log("item：", item)
+          formData.append("picture", item)
+        })
+      }
+      // console.log(formData.getAll("picture"))
+      //2，调用动态配图接口
+      //切记切记已经出现过很多次响应式的值忘了带value直接丢过去的问题了
+      await store.dispatch("upload/uploadMomentPicturesAction", {
+        momentId: insertId.value,
+        fileList: formData,
+      })
 
       //提示发布成功且清空内容
       ElMessage({
@@ -225,6 +299,7 @@ export default defineComponent({
       })
       textarea.value = ""
       momentlabelList.clear()
+      upload.value.clearFiles()
       forceBlur(event)
     }
 
@@ -235,6 +310,8 @@ export default defineComponent({
       momentlabelList,
       dialogVisible,
       newLabel,
+      uploadFileList,
+      upload,
       handlePublishMomment,
       handleClearMomment,
       handleSizeChange,
@@ -242,6 +319,8 @@ export default defineComponent({
       chooseLabel,
       handleCloseTag,
       handleAddNewLable,
+      handleRemove,
+      handleChange,
     }
   },
 })
