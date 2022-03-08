@@ -13,7 +13,7 @@
       </template>
     </i>
     <div class="content">
-      <!-- <div>面包屑</div> -->
+      <div></div>
       <user-info></user-info>
     </div>
   </div>

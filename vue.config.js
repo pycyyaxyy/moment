@@ -3,8 +3,9 @@ module.exports = defineConfig({
   transpileDependencies: true,
 
   //配置方式1-1 使用cli提供的属性
-  outputDir: "./build",
-  // publicPath: './',
+  outputDir: "./dist",
+  // publicPath: "./",
+
   //配置方式1-2 和webpack属性完全一致 会进行合并
   devServer: {
     proxy: {
